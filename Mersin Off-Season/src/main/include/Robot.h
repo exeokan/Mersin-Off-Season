@@ -28,27 +28,31 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override;
   void TestPeriodic() override;
 
+  void tirmanma();
+  void hatch();
+  void driveAssist(double angle);
   private:
   frc::Preferences *prefs=frc::Preferences::GetInstance();
   nt::NetworkTableEntry ntAngle;
 
   frc::Joystick js{0};
 
-  frc::Talon solOn{1};    frc::Talon sagOn{2};
-  frc::Talon solArka{0};  frc::Talon sagArka{3}; 
-
-  VictorSPX tirmanma1{0};
-  VictorSPX tirmanma2{1};
-  double tempTirmanma=0.0; //SmartDashboard verisi için-motorlara verilecek güç 
+  frc::Talon solOn{2};    frc::Talon sagOn{0};//PWM
+  frc::Talon solArka{2};  frc::Talon sagArka{3}; 
 
   frc::SpeedControllerGroup left{solOn,solArka};
   frc::SpeedControllerGroup right{sagOn,sagArka};
-  
   frc::DifferentialDrive rd{left,right};
+
+  VictorSPX tirmanma1{1};//CAN Bus
+  VictorSPX tirmanma2{0};
+  double tempTirmanma=0.0; //SmartDashboard verisi için-motorlara verilecek güç 
+  frc::VictorSP hatchMotor{1};//! kontrol et
 
   bool goruyor;
   double lastAngle=0;
   double kp=0.0,kd=0.0,ki=0.0;
   double errorI=0;
   bool assist=false;
+  
 };

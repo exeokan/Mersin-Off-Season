@@ -6,8 +6,10 @@
 /* KelRot#5655 Deep Space Code for Mersin Off-Season                          */
 /*----------------------------------------------------------------------------*/
 
-#include "Robot.h"
 #include <math.h>
+#include "driveAssist.h"
+#include "hatch.h"
+#include "tirmanma.h"
 
 #include <iostream>
 
@@ -23,30 +25,10 @@ void Robot::RobotPeriodic() {
   kp=prefs->GetDouble("KP",0.00);
   kd=prefs->GetDouble("KD",0.0);
   ki=prefs->GetDouble("KI",0.0);
-  tempTirmanma=prefs->GetDouble("Tirmanma",0.0); //*tırmanma motorlarına verilecek hızı SmartDashboard'dan almak için
+  tempTirmanma=prefs->GetDouble("Tirmanma",0.5); //*tırmanma motorlarına verilecek hızı SmartDashboard'dan almak için
 }
 void Robot::AutonomousInit() {}
-
-void Robot::AutonomousPeriodic() {//! şuan sadece tırmanma denemek için 
-  rd.CurvatureDrive(-js.GetRawAxis(1),js.GetRawAxis(4),js.GetRawButton(5));
-  if(js.GetRawButton(1))
-  {
-    tirmanma1.Set(ControlMode::PercentOutput,tempTirmanma);
-    tirmanma2.Set(ControlMode::PercentOutput,tempTirmanma);
-    std::cout<<tempTirmanma<<std::endl;
-  }
-  else if(js.GetRawButton(2))
-  {
-    tirmanma1.Set(ControlMode::PercentOutput,-tempTirmanma);
-    tirmanma2.Set(ControlMode::PercentOutput,-tempTirmanma);
-    std::cout<<tempTirmanma<<std::endl;
-  }
-  else{
-    tirmanma1.Set(ControlMode::PercentOutput,0.0);
-    tirmanma2.Set(ControlMode::PercentOutput,0.0);
-    
-  }
-}
+void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   assist=false;
@@ -54,6 +36,8 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {
   double angle=ntAngle.GetDouble(777.0);//* raspberryden gelen açı değeri,777.0 default değer
+  tirmanma();
+  hatch();
   if(angle>700)
   {
     std::cout<<"gormuyor"<<std::endl;
@@ -64,7 +48,7 @@ void Robot::TeleopPeriodic() {
     goruyor=true;
   }
 
-  if(js.GetRawButtonPressed(1)){
+  if(js.GetRawButtonPressed(2)){
   assist=!assist; 
   }
 
@@ -73,40 +57,10 @@ void Robot::TeleopPeriodic() {
   }
   else
   {
-    std::cout << "Auto:ON" << std::endl;
-    double rot=0;
-    if(goruyor){
-      double errorP =(angle/30.0);
-      double errorD = (angle/30.0-lastAngle);
-      lastAngle= (angle/30.0);
-      if(abs(angle) <= 8.0 && abs(angle)>0.5){
-        errorI += errorP;
-      }
-      else{//* aralıkta değil ise hesaplama
-        errorI=0;
-      }
-      //* integrali sınırlama
-      if(errorI>  50/ki){
-        errorI = 50/ki;
-      }
-      else if(errorI< -50/ki){
-        errorI = -50/ki;
-      }
-      rot= errorP*kp + errorI*ki + errorD*kd;
-      if(rot>=1.00)
-      {
-        rot= 1.0;
-      }
-      else if(rot<=-1.0)
-      {
-        rot= -1.0;
-      }
-    }
-    double speed=-js.GetRawAxis(1);
-    rd.ArcadeDrive(speed,rot);
+    std::cout << "Auto:ON" << std::endl; 
+    driveAssist(angle);
   }
-}
-
+}  
 void Robot::TestPeriodic() {
   
 }
