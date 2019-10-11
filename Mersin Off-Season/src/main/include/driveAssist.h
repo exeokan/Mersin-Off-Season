@@ -9,10 +9,10 @@ void Robot::driveAssist(double angle)
       if(abs(angle) <= 8.0 && abs(angle)>0.5){
         errorI += errorP;
       }
-      else{//* aralıkta değil ise hesaplama
+      else{//* aralıkta değil I'yı ise hesaplama
         errorI=0;
       }
-      //* integrali sınırı
+      //* integral sınırı
       if(errorI > 50/ki){
         errorI = 50/ki;
       }
@@ -29,6 +29,6 @@ void Robot::driveAssist(double angle)
         rot= -1.0;
       }
     }
-    double speed=-js.GetRawAxis(4);
+    double speed=0.4;//! değiştirilebilir
     rd.ArcadeDrive(speed,rot);
 }
