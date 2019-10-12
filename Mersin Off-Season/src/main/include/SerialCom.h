@@ -16,20 +16,21 @@ for(int i = 0; i < 12; i++)
       right= dist.substr(5, 5);
       distleft= std::stod(left);
       distright=std::stod(right);
+      //std::cout<<distleft<<"sag= "<<distright<<std::endl;
       /*
                /___| ultrasonik sol
              /_ ___|
-            /_  ___|  26 cm             
+            /_  ___|  45 cm             
           / _ _ ___|   
         / _ _ _ ___|  ultrasonik sag
         sağ-sol cm
 
         x= (sağ-sol) karşı 
-        (26 cm)   komşu
+        (45 cm)   komşu
 
-        x/26 = tan(açımız)
-        atan2(x/26) = AÇIMIZ
+        x/45 = tan(açımız)
+        atan2(x/45) = AÇIMIZ
       */
-      aci = atan2(distright-distleft,26); //! 26 SANTIM DEĞİL DEĞİŞECEK!!!!!!!!!!!!!!1 >:c
+      aci = atan2(distright-distleft,45); //! takıldıktan sonra tekrar ölçülecek
     }
 }

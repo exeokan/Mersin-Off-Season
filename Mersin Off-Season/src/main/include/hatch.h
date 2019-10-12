@@ -1,4 +1,5 @@
 #include "Robot.h"
+#include <iostream>
 void Robot::manuelHatch()
 {
   double speed=0.4;
@@ -24,7 +25,6 @@ int Robot::getHatchPosition()
 double Robot::hatchPID()
 {
   int pos=getHatchPosition();//anlık pozisyon
-
   //* olması gereken aralık(0-150) dışında ise yavaşça aralığa geri alma
   if(pos>160){ 
     return -0.2;

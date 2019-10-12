@@ -29,6 +29,6 @@ void Robot::driveAssist(double angle)
         rot= -1.0;
       }
     }
-    double speed=0.4;//! değiştirilebilir
+    double speed=js.GetRawAxis(3);//! değiştirilebilir
     rd.ArcadeDrive(speed,rot);
 }
