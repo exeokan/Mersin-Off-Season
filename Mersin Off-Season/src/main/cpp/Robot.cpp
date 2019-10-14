@@ -31,42 +31,57 @@ void Robot::RobotPeriodic() {
 
   tempTirmanma=prefs->GetDouble("Tirmanma",0.5); //*tırmanma motorlarına verilecek hızı SmartDashboard'dan almak için
 }
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+  hatchEncoder.Reset(); 
+}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  hatchEncoder.Reset();
+ // hatchEncoder.Reset(); 
   assist=false;
   hatchRef=75;
-  autoHatch=false;
+  hatchTasima=true;
+  reversedDrive=false;
 }
 
 void Robot::TeleopPeriodic() {
   double angle=ntAngle.GetDouble(777.0);//* raspberryden gelen açı değeri,777.0 default değer
+  //std::cout<<getHatchPosition()<<std::endl;
+  //*                            Tırmanma
   tirmanma();
-  updateSerialData();
-  //Drive Assist
-  if(angle>700)
+  std::cout<<distleft<<" "<<distright<<" "<<  aci <<std::endl;
+  
+  //*               Drive Assist ve görüntü işleme verileri
+  updateSerialData();//ultrasonik verilerini güncelle
+  if(angle>700)//Yanlış verileri eler
   {
-    std::cout<<"gormuyor"<<std::endl;
+    std::cout<<"Goruntu isleme hedefi goremiyor"<<std::endl;
     goruyor=false; 
   }
   else{
     std::cout <<"Goruntu isleme aci="<< angle << std::endl;
     goruyor=true;
   } 
-  if(js.GetRawButtonPressed(8)){//Drive Assist açma
-    assist=!assist; 
+  assist=js.GetRawButton(8) || js.GetRawButton(7);
+
+  //*                   Tırmanma ve defans modu
+  if(js.GetRawButtonPressed(9)){//Back tuşu 
+    reversedDrive= !reversedDrive;//sürüşü tersine çevirir(line 74)
+    if(reversedDrive)
+    {
+      hatchRef=0;
+    }
   }
-  if(js.GetRawButtonPressed(7)){//Back tuşu -tırmanma ve defans modu
-    reversedDrive= !reversedDrive;//sürüşü tersine çevirir(line 90)
-    hatchRef=0;
-  }
+
+  //*                   Sürüş ve Drive Assist
   if(!assist){
     if(reversedDrive)
-    rd.CurvatureDrive(js.GetRawAxis(1),js.GetRawAxis(4),js.GetRawButton(5));
+    {
+      std::cout<<"Ters surus"<<std::endl;
+    rd.CurvatureDrive(js.GetRawAxis(1),js.GetRawAxis(2),js.GetRawButton(5));
+    }
     else
-    rd.CurvatureDrive(-js.GetRawAxis(1),js.GetRawAxis(4),js.GetRawButton(5));
+    rd.CurvatureDrive(-js.GetRawAxis(1),js.GetRawAxis(2),js.GetRawButton(5));
   }
   else
   {
@@ -74,16 +89,21 @@ void Robot::TeleopPeriodic() {
     driveAssist(angle);
   }
 
-  //* Hatch
-  if(js.GetRawButtonPressed(2))
+  //*                   Hatch
+  if(js.GetRawButtonPressed(3))
   {
-    hatchTasima= !hatchTasima;
-    if(hatchTasima)
-    hatchRef=75;
-    else
-    hatchRef=150;
+    if(!reversedDrive)
+      {
+      hatchTasima= !hatchTasima;
+      if(hatchTasima){
+        hatchRef=75;
+      }
+      else{
+        hatchRef=150;
+      }
+    }
   }
- // hatchMotor.Set(hatchPID());
+  hatchMotor.Set(hatchPID());
 } 
 void Robot::TestPeriodic() {}
 

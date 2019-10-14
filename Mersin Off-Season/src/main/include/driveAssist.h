@@ -1,6 +1,6 @@
 #include "Robot.h"
 #include <iostream>
-
+#define PI 3.14159265358979323846
 void Robot::driveAssist(double angle)
 {
   double rot=0,speed;
@@ -30,77 +30,24 @@ void Robot::driveAssist(double angle)
     {
       rot= -1.0;
     }
-    speed=js.GetRawAxis(1);
+    speed=-js.GetRawAxis(1);
     rd.ArcadeDrive(speed,rot);
   }
   else if(!goruyor && js.GetRawButton(8))
   {
-    speed=js.GetRawAxis(1);
+    speed=-js.GetRawAxis(1);
     rd.ArcadeDrive(speed,rot);
   }
   else if(js.GetRawButtonPressed(7))
   {
-    ultrasonicException=false;
-    calculateUltra();
+    goal=aci*(180/PI);
+    gyro.Reset();
   }
   else if(js.GetRawButton(7))
   {
-      if(ultrasonicException)
-      {
-        //!ALERT
-      }
-      else if(leftArc > rightArc)
-      {
-      float current = ecDrive_right.Get()/1024*48;
-      float rightSet = (rightArc-current)*auto_kP;
-      if(rightSet > 1){
-        rightSet = 1;
-      }
-      float leftSet = leftArc/rightArc * rightSet;
-      
-      solOn.Set(leftSet);
-      solArka.Set(leftSet);
-      sagOn.Set(rightSet*-1.0);
-      sagArka.Set(rightSet*-1.0);
-      }
-      else if(rightArc > leftArc){
-      float current = ecDrive_right.Get()/1024*48;
-      float rightSet = (rightArc-current)*auto_kP;
-      if(rightSet > 1){
-        rightSet = 1;
-      }
-      float leftSet = leftArc/rightArc * rightSet;
-      
-      solOn.Set(leftSet);
-      solArka.Set(leftSet);
-      sagOn.Set(rightSet*-1.0);
-      sagArka.Set(rightSet*-1.0);
-      }
+    double error=goal-gyro.GetAngle();
+    std::cout<<error<<gyro.GetAngle()<<std::endl;
+    rd.ArcadeDrive(0,error*-0.2);
   }
-}
-
-void Robot::calculateUltra()
-{
-  if(distleft==distright)
-  {
-    std::cout<<"mesafeler esit"<<std::endl; //!drive 
-    ultrasonicException=true;
-  }
-  else if(distleft>distright)
-  {
-    double x=45*distright/(distleft-distright);
-    leftArc=45+x+2; // 2=ultrasonik teker arası
-    leftArc=leftArc*aci;
-
-    rightArc=x-2;
-    rightArc=rightArc*aci;
-    ecDrive_right.Reset();
-  } 
-  else
-  {
-    double x=45*distleft/(distright-distleft);
-    rightArc=45+x+2; // 2=ultrasonik teker arası
-    leftArc=x-2;
-    ecDrive_right.Reset();
-  }   
+  
 }

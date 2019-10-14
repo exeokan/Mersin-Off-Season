@@ -42,7 +42,7 @@ class Robot : public frc::TimedRobot {
   frc::Preferences *prefs=frc::Preferences::GetInstance();
   nt::NetworkTableEntry ntAngle;
 
-  frc::Joystick js{0};
+  frc::Joystick js{1};
 
   frc::Talon solOn{2};    frc::Talon sagOn{0};//PWM
   frc::Talon solArka{2};  frc::Talon sagArka{3}; 
@@ -60,10 +60,10 @@ class Robot : public frc::TimedRobot {
 
   bool goruyor;
   double lastAngle=0;
-  double kp=0.0,kd=0.0,ki=0.0;
+  double kp=0.0,kd=0.0,ki=0.0;//görüntü işleme için
   double errorI=0;
   bool assist=false,reversedDrive=false;
-  bool autoHatch=false,hatchTasima=true;
+  bool hatchTasima=true;
 
   double hatchP,hatchI,hatchD;
   double hErrorI=0,hatchRef,lastError=0;
@@ -75,7 +75,10 @@ class Robot : public frc::TimedRobot {
   double distleft,distright;
   double leftArc,rightArc;
   bool ultrasonicException=false;
+
   frc::Encoder ecDrive_right{4,5};//!
  // frc::Encoder ecDrive_right{,};
-  double auto_kP=0.2;//! hesaplanmadı
+  double auto_kP=0.02;//! hesaplanmadı
+  double goal;
+  frc::ADIS16470_IMU gyro{};
 };
