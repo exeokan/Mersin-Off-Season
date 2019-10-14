@@ -11,11 +11,10 @@
 #include "hatch.h"
 #include "tirmanma.h"
 #include "SerialCom.h"
-#include <iostream>
 #include "Robot.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 
-  void Robot::RobotInit() {
+void Robot::RobotInit() {
   auto inst=nt::NetworkTableInstance::GetDefault();
   auto table=inst.GetTable("ChickenVision");
   ntAngle=table->GetEntry("HedefAci");
@@ -38,32 +37,30 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {
   hatchEncoder.Reset();
   assist=false;
-  
+  hatchRef=75;
   autoHatch=false;
 }
 
 void Robot::TeleopPeriodic() {
   double angle=ntAngle.GetDouble(777.0);//* raspberryden gelen açı değeri,777.0 default değer
-  //std::cout<<getHatchPosition()<<std::endl;
   tirmanma();
   updateSerialData();
- // std::cout<<ecDrive_right.Get()<<std::endl;
-   std::cout<<aci<<std::endl;
   //Drive Assist
   if(angle>700)
   {
-    //std::cout<<"gormuyor"<<std::endl;
+    std::cout<<"gormuyor"<<std::endl;
     goruyor=false; 
   }
   else{
-    //std::cout << angle << std::endl;
+    std::cout <<"Goruntu isleme aci="<< angle << std::endl;
     goruyor=true;
   } 
-  if(js.GetRawButtonPressed(8)){
+  if(js.GetRawButtonPressed(8)){//Drive Assist açma
     assist=!assist; 
   }
-  if(js.GetRawButtonPressed(7)){//Back tuşu
+  if(js.GetRawButtonPressed(7)){//Back tuşu -tırmanma ve defans modu
     reversedDrive= !reversedDrive;//sürüşü tersine çevirir(line 90)
+    hatchRef=0;
   }
   if(!assist){
     if(reversedDrive)
@@ -77,72 +74,6 @@ void Robot::TeleopPeriodic() {
     driveAssist(angle);
   }
 
- if(js.GetRawButtonPressed(3)){
-    if(distleft==distright)
-    {
-      std::cout<<"mesafeler esit"<<std::endl; //drive
-    }
-    else if(distleft>distright)
-    {
-      double x=45*distright/(distleft-distright);
-      leftArc=45+x+2; // 2=ultrasonik teker arası
-      leftArc=leftArc*aci;
-
-      rightArc=x-2;
-      rightArc=rightArc*aci;
-      ecDrive_right.Reset();
-      hizala= !hizala; 
-    } 
-    else
-    {
-      double x=45*distleft/(distright-distleft);
-      rightArc=45+x+2; // 2=ultrasonik teker arası
-      leftArc=x-2;
-      ecDrive_right.Reset();
-      hizala= !hizala; 
-    }   
-
-  }
-  if(hizala){
-      /*
-      if(leftArc > rightArc){ 
-      float current = ecDrive_left.Get()/1024*48;
-      float leftSet = (leftArc-current)*auto_kP;
-      if(leftSet > 1){
-        leftSet = 1;
-      }
-      float rightSet = rightArc/leftArc * leftSet;
-      
-      solOn.Set(leftSet);
-      solArka.Set(leftSet);
-      sagOn.Set(rightSet*-1.0);
-      sagArka.Set(rightSet*-1.0);
-     */
-      float current = ecDrive_right.Get()/1024*48;
-      float rightSet = (rightArc-current)*auto_kP;
-      if(rightSet > 1){
-        rightSet = 1;
-      }
-      float leftSet = leftArc/rightArc * rightSet;
-      
-      solOn.Set(leftSet);
-      solArka.Set(leftSet);
-      sagOn.Set(rightSet*-1.0);
-      sagArka.Set(rightSet*-1.0);
-    }
-    if(rightArc > leftArc){
-      float current = ecDrive_right.Get()/1024*48;
-      float rightSet = (rightArc-current)*auto_kP;
-      if(rightSet > 1){
-        rightSet = 1;
-      }
-      float leftSet = leftArc/rightArc * rightSet;
-      
-      solOn.Set(leftSet);
-      solArka.Set(leftSet);
-      sagOn.Set(rightSet*-1.0);
-      sagArka.Set(rightSet*-1.0);
-  }
   //* Hatch
   if(js.GetRawButtonPressed(2))
   {
@@ -152,11 +83,9 @@ void Robot::TeleopPeriodic() {
     else
     hatchRef=150;
   }
-  hatchMotor.Set(hatchPID());
+ // hatchMotor.Set(hatchPID());
 } 
-void Robot::TestPeriodic() {
-  
-}
+void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }

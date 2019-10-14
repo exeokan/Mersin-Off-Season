@@ -37,6 +37,7 @@ class Robot : public frc::TimedRobot {
   int getHatchPosition();
   void driveAssist(double angle);
   void updateSerialData();
+  void calculateUltra();
 
   frc::Preferences *prefs=frc::Preferences::GetInstance();
   nt::NetworkTableEntry ntAngle;
@@ -63,7 +64,6 @@ class Robot : public frc::TimedRobot {
   double errorI=0;
   bool assist=false,reversedDrive=false;
   bool autoHatch=false,hatchTasima=true;
-  bool hizala=false;
 
   double hatchP,hatchI,hatchD;
   double hErrorI=0,hatchRef,lastError=0;
@@ -74,6 +74,7 @@ class Robot : public frc::TimedRobot {
   double aci=0.0;
   double distleft,distright;
   double leftArc,rightArc;
+  bool ultrasonicException=false;
   frc::Encoder ecDrive_right{4,5};//!
  // frc::Encoder ecDrive_right{,};
   double auto_kP=0.2;//! hesaplanmadı

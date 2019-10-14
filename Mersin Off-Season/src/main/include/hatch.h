@@ -1,21 +1,6 @@
 #include "Robot.h"
 #include <iostream>
-void Robot::manuelHatch()
-{
-  double speed=0.4;
-  if(js.GetRawButton(4))
-  {  
-    hatchMotor.Set(speed);
-  }
-  else if(js.GetRawButton(1))
-  {
-    hatchMotor.Set(-speed);
-  }  
-  else
-  {
-    hatchMotor.Set(0); 
-  }
-}
+
 int Robot::getHatchPosition()
 {
   int pos=hatchEncoder.Get();
