@@ -28,25 +28,12 @@ void Robot::RobotPeriodic() {
   hatchP=prefs->GetDouble("Hatch P",0.0);
   hatchI=prefs->GetDouble("Hatch I",0.0);
   hatchD=prefs->GetDouble("Hatch D",0.0);
-
+  //! PID değerlerini yaz
   tempTirmanma=prefs->GetDouble("Tirmanma",0.5); //*tırmanma motorlarına verilecek hızı SmartDashboard'dan almak için
 }
-void Robot::AutonomousInit() {
-  hatchEncoder.Reset(); 
-}
-void Robot::AutonomousPeriodic() {}
-
-void Robot::TeleopInit() {
- // hatchEncoder.Reset(); 
-  assist=false;
-  hatchRef=75;
-  hatchTasima=true;
-  reversedDrive=false;
-}
-
-void Robot::TeleopPeriodic() {
+void Robot::Periodic()
+{
   double angle=ntAngle.GetDouble(777.0);//* raspberryden gelen açı değeri,777.0 default değer
-  //std::cout<<getHatchPosition()<<std::endl;
   //*                            Tırmanma
   tirmanma();
   std::cout<<distleft<<" "<<distright<<" "<<  aci <<std::endl;
@@ -64,24 +51,17 @@ void Robot::TeleopPeriodic() {
   } 
   assist=js.GetRawButton(8) || js.GetRawButton(7);
 
-  //*                   Tırmanma ve defans modu
+  //*                       Defans modu
   if(js.GetRawButtonPressed(9)){//Back tuşu 
-    reversedDrive= !reversedDrive;//sürüşü tersine çevirir(line 74)
-    if(reversedDrive)
+    defans= !defans;
+    if(defans)
     {
       hatchRef=0;
     }
   }
-
   //*                   Sürüş ve Drive Assist
   if(!assist){
-    if(reversedDrive)
-    {
-      std::cout<<"Ters surus"<<std::endl;
     rd.CurvatureDrive(js.GetRawAxis(1),js.GetRawAxis(2),js.GetRawButton(5));
-    }
-    else
-    rd.CurvatureDrive(-js.GetRawAxis(1),js.GetRawAxis(2),js.GetRawButton(5));
   }
   else
   {
@@ -92,7 +72,7 @@ void Robot::TeleopPeriodic() {
   //*                   Hatch
   if(js.GetRawButtonPressed(3))
   {
-    if(!reversedDrive)
+    if(!defans)
       {
       hatchTasima= !hatchTasima;
       if(hatchTasima){
@@ -104,6 +84,25 @@ void Robot::TeleopPeriodic() {
     }
   }
   hatchMotor.Set(hatchPID());
+}
+
+
+//* ANA AKIŞ
+void Robot::AutonomousInit() {
+  hatchEncoder.Reset(); 
+  assist=false;
+  hatchRef=75;
+  hatchTasima=true;
+  defans=false;
+}
+void Robot::AutonomousPeriodic() {
+  Periodic();
+}
+
+void Robot::TeleopInit() {}
+
+void Robot::TeleopPeriodic() {
+  Periodic();
 } 
 void Robot::TestPeriodic() {}
 

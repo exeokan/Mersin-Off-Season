@@ -38,6 +38,7 @@ class Robot : public frc::TimedRobot {
   void driveAssist(double angle);
   void updateSerialData();
   void calculateUltra();
+  void Periodic();
 
   frc::Preferences *prefs=frc::Preferences::GetInstance();
   nt::NetworkTableEntry ntAngle;
@@ -62,7 +63,8 @@ class Robot : public frc::TimedRobot {
   double lastAngle=0;
   double kp=0.0,kd=0.0,ki=0.0;//görüntü işleme için
   double errorI=0;
-  bool assist=false,reversedDrive=false;
+
+  bool assist=false,defans=false;
   bool hatchTasima=true;
 
   double hatchP,hatchI,hatchD;
@@ -76,8 +78,6 @@ class Robot : public frc::TimedRobot {
   double leftArc,rightArc;
   bool ultrasonicException=false;
 
-  frc::Encoder ecDrive_right{4,5};//!
- // frc::Encoder ecDrive_right{,};
   double auto_kP=0.02;//! hesaplanmadı
   double goal;
   frc::ADIS16470_IMU gyro{};

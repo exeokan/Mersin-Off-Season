@@ -10,7 +10,7 @@ void Robot::updateSerialData()
     serial.Read(&buffer[i],serial.GetBytesReceived()); 
   } 
   std::string dist{buffer},left,right;
-  if(isdigit(dist[0]) ==  1)
+  if(isdigit(dist[0]) ==  1 && !dist.empty())
   {
     left = dist.substr(0, 5);//string'i sol ve sag stringlere aktarma
     right= dist.substr(5, 5);

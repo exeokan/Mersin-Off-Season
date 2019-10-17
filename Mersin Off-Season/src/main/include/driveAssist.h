@@ -49,5 +49,4 @@ void Robot::driveAssist(double angle)
     std::cout<<error<<gyro.GetAngle()<<std::endl;
     rd.ArcadeDrive(0,error*-0.2);
   }
-  
 }
